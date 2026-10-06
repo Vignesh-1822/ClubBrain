@@ -5,6 +5,7 @@ from typing import Dict, List, Optional
 
 from models.schemas import Memory
 
+ANTHROPIC_MODELS = ["claude-sonnet-5-5", "claude-sonnet-4-5"]
 CATEGORIES = ["decision", "lesson", "person", "sponsor", "event", "preference", "warning"]
 
 
@@ -21,12 +22,20 @@ def _complete(system: str, user: str) -> str:
         import anthropic
 
         client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
-        resp = client.messages.create(
-            model="claude-sonnet-5-5",
-            max_tokens=400,
-            system=system,
-            messages=[{"role": "user", "content": user}],
-        )
+        resp = None
+        for model in ANTHROPIC_MODELS:
+            try:
+                resp = client.messages.create(
+                    model=model,
+                    max_tokens=400,
+                    system=system,
+                    messages=[{"role": "user", "content": user}],
+                )
+                break
+            except anthropic.NotFoundError:
+                continue
+        if resp is None:
+            raise RuntimeError("No Anthropic model available")
         return "".join(b.text for b in resp.content if getattr(b, "text", None))
     import openai
 
@@ -74,7 +83,10 @@ def detect_memory(sender: str, content: str) -> Optional[Dict[str, str]]:
         return _heuristic_detect(content)
     system = (
         "You extract durable organizational knowledge for a student club (decisions, lessons, "
-        "people/responsibilities, sponsors, events, preferences, warnings). Respond with strict JSON only: "
+        "people/responsibilities, sponsors, events, preferences, warnings). Rewrite the message into a clean, "
+        "self-contained, durable memory in third person with no chat filler, keeping key facts and numbers, e.g. "
+        "\"Avoid Memorial Union for events over 150 people — 2025 hackathon (~287 attendees) had registration congestion.\" "
+        "Respond with strict JSON only: "
         '{"memory": null} if nothing durable, else {"memory": {"text": "<concise rewrite>", "category": "<one of '
         + ", ".join(CATEGORIES)
         + '>"}}'

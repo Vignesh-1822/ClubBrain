@@ -73,13 +73,16 @@ def _local_search(query: str, limit: int) -> List[Memory]:
 def add_memory(text: str, category: str, source: str) -> Memory:
     memory = Memory(id=str(uuid.uuid4()), text=text, category=category, source=source, created_at=_now())
     if _mem0_ok:
-        messages = [{"role": "user", "content": text}]
-        meta = {"category": category, "source": source}
         try:
-            try:
-                _client.add(messages, user_id=CLUB_ID, metadata=meta, infer=False)
-            except TypeError:
-                _client.add(messages, user_id=CLUB_ID, metadata=meta)
+            resp = _client.add(
+                [{"role": "user", "content": text}],
+                user_id=CLUB_ID,
+                metadata={"category": category, "source": source},
+                infer=False,
+            )
+            results = resp.get("results", []) if isinstance(resp, dict) else []
+            if results and results[0].get("id"):
+                memory.id = str(results[0]["id"])
             return memory
         except Exception:
             pass
@@ -90,10 +93,7 @@ def add_memory(text: str, category: str, source: str) -> Memory:
 def search(query: str, limit: int = 6) -> List[Memory]:
     if _mem0_ok:
         try:
-            try:
-                return _normalize(_client.search(query, user_id=CLUB_ID, limit=limit))
-            except Exception:
-                return _normalize(_client.search(query, filters={"user_id": CLUB_ID}, version="v2"))
+            return _normalize(_client.search(query, filters={"user_id": CLUB_ID}, top_k=limit))
         except Exception:
             pass
     return _local_search(query, limit)
@@ -102,10 +102,7 @@ def search(query: str, limit: int = 6) -> List[Memory]:
 def get_all() -> List[Memory]:
     if _mem0_ok:
         try:
-            try:
-                return _normalize(_client.get_all(user_id=CLUB_ID))
-            except Exception:
-                return _normalize(_client.get_all(filters={"user_id": CLUB_ID}, version="v2"))
+            return _normalize(_client.get_all(filters={"user_id": CLUB_ID}, page_size=100))
         except Exception:
             pass
     return list(_local)
@@ -130,7 +127,14 @@ SEED_MEMORIES = [
 ]
 
 
+SEED_THRESHOLD = 8
+
+
 def seed() -> int:
+    """Idempotent: skip seeding when the club already has enough memories."""
+    existing = len(get_all())
+    if existing >= SEED_THRESHOLD:
+        return existing
     for category, text in SEED_MEMORIES:
         add_memory(text, category, "Demo seed")
     return len(SEED_MEMORIES)

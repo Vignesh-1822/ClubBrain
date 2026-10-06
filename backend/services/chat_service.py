@@ -40,6 +40,9 @@ def handle_chat(sender: str, content: str) -> List[Message]:
     else:
         detected = llm_service.detect_memory(sender, content)
         if detected:
-            user_msg.detected_memory = DetectedMemory(**detected)
+            saved = memory_service.add_memory(detected["text"], detected["category"], f"Club chat — {sender}")
+            user_msg.detected_memory = DetectedMemory(
+                text=saved.text, category=saved.category, saved=True, memory_id=saved.id
+            )
     _history.extend(new_messages)
     return new_messages

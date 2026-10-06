@@ -14,6 +14,8 @@ class Memory(BaseModel):
 class DetectedMemory(BaseModel):
     text: str
     category: str
+    saved: bool = True
+    memory_id: Optional[str] = None
 
 
 class Message(BaseModel):
