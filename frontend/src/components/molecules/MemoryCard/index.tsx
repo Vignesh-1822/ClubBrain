@@ -1,16 +1,45 @@
-import { formatDate } from '../../../lib/category'
+import { formatDate, formatRelative, getCategoryIcon, getCategoryMeta } from '../../../lib/category'
 import type { Memory } from '../../../types'
-import CategoryBadge from '../../atoms/CategoryBadge'
 
-export default function MemoryCard({ memory, compact = false }: { memory: Memory; compact?: boolean }) {
+interface Props {
+  memory: Memory
+  compact?: boolean
+  animation?: 'pop' | 'glow' | 'none'
+  isNew?: boolean
+  index?: number
+}
+
+const ANIMATION_CLASS = { pop: 'animate-pop-in', glow: 'animate-memory-in', none: '' } as const
+
+export default function MemoryCard({ memory, compact = false, animation = 'pop', isNew = false, index }: Props) {
+  const meta = getCategoryMeta(memory.category)
+  const Icon = getCategoryIcon(memory.category)
   const isWarning = memory.category === 'warning'
   return (
-    <div className={`rounded-xl border bg-white p-3 shadow-sm ${isWarning ? 'border-red-200' : 'border-slate-200'}`}>
-      <CategoryBadge category={memory.category} />
-      <p className={`mt-2 text-slate-800 ${compact ? 'text-xs' : 'text-sm'}`}>{memory.text}</p>
-      <p className="mt-2 text-[11px] text-slate-400">
-        {memory.source} · {formatDate(memory.created_at)}
+    <article
+      className={`group relative overflow-hidden rounded-2xl border bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition hover:-translate-y-px hover:shadow-[0_6px_20px_-8px_rgba(15,23,42,0.18)] ${
+        isWarning ? 'border-rose-200/80' : 'border-slate-200/80'
+      } ${compact ? 'p-3' : 'p-4'} ${ANIMATION_CLASS[animation]}`}
+      style={index !== undefined && animation === 'pop' ? { animationDelay: `${Math.min(index, 10) * 30}ms` } : undefined}
+    >
+      {isWarning && <span className="absolute inset-y-0 left-0 w-[3px] bg-rose-500" />}
+      <div className="flex items-center gap-2">
+        <span className={`flex shrink-0 items-center justify-center rounded-lg ring-1 ring-inset ${meta.tile} ${compact ? 'h-6 w-6' : 'h-7 w-7'}`}>
+          <Icon size={compact ? 12 : 14} strokeWidth={2.3} />
+        </span>
+        <span className={`text-[11px] font-semibold uppercase tracking-wide ${meta.text}`}>{meta.label}</span>
+        {isNew && (
+          <span className="rounded-full bg-violet-100 px-1.5 py-px text-[10px] font-semibold text-violet-700">New</span>
+        )}
+        <time className="ml-auto text-[11px] text-slate-400" title={formatDate(memory.created_at)}>
+          {formatRelative(memory.created_at)}
+        </time>
+      </div>
+      <p className={`mt-2 leading-relaxed text-slate-800 ${compact ? 'text-[13px]' : 'text-sm'}`}>{memory.text}</p>
+      <p className="mt-2.5 flex items-center gap-1.5 truncate text-[11px] text-slate-400">
+        <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${meta.dot}`} />
+        {memory.source}
       </p>
-    </div>
+    </article>
   )
 }

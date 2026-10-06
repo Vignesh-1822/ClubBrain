@@ -1,11 +1,12 @@
-import { CATEGORY_META } from '../../../lib/category'
+import { getCategoryIcon, getCategoryMeta } from '../../../lib/category'
 import type { Category } from '../../../types'
 
 export default function CategoryBadge({ category }: { category: Category }) {
-  const meta = CATEGORY_META[category] ?? CATEGORY_META.lesson
+  const meta = getCategoryMeta(category)
+  const Icon = getCategoryIcon(category)
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium ${meta.classes}`}>
-      <span>{meta.icon}</span>
+    <span className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-medium ring-1 ring-inset ${meta.tile}`}>
+      <Icon size={11} strokeWidth={2.4} />
       {meta.label}
     </span>
   )

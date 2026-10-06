@@ -48,4 +48,28 @@ export interface Persona {
   role: string
 }
 
+export interface CategoryMeta {
+  label: string
+  plural: string
+  /** text color for labels */
+  text: string
+  /** soft icon tile background + icon color */
+  tile: string
+  /** solid dot / accent bar color */
+  dot: string
+  /** active filter chip classes */
+  chip: string
+}
+
+export interface MemoryTrace {
+  question: string | null
+  answer: string
+  memories: Memory[]
+}
+
+export interface MessageGrouping {
+  isFirstInGroup: boolean
+  isLastInGroup: boolean
+}
+
 export type DetectedStatus = 'idle' | 'saved' | 'dismissed'
