@@ -1,6 +1,27 @@
+# Secrets
 .env
+.env.*
+!.env.example
+
+# Python
 venv/
-node_modules/
+.venv/
 __pycache__/
-.DS_Store
+*.pyc
+
+# Node
+node_modules/
 dist/
+dist-ssr/
+*.log
+
+# Video renders (the published cut lives in docs/)
+video/out/
+*.mp4
+!docs/*.mp4
+
+# OS / editor
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+.idea/
