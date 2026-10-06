@@ -1,4 +1,14 @@
-import type { ChatRequest, ChatResponse, Category, HealthStatus, Memory, Message, NewMemory } from '../types'
+import type {
+  ChatRequest,
+  ChatResponse,
+  HealthStatus,
+  Memory,
+  MemoryFilter,
+  Message,
+  NewMemory,
+  ResetResponse,
+  WelcomeRequest,
+} from '../types'
 
 async function request<T>(url: string, init?: RequestInit): Promise<T> {
   const res = await fetch(url, {
@@ -13,9 +23,12 @@ export const getHealth = () => request<HealthStatus>('/api/health')
 export const getMessages = () => request<Message[]>('/api/messages')
 export const postChat = (body: ChatRequest) =>
   request<ChatResponse>('/api/chat', { method: 'POST', body: JSON.stringify(body) })
+export const postWelcome = (body: WelcomeRequest) =>
+  request<ChatResponse>('/api/welcome', { method: 'POST', body: JSON.stringify(body) })
+export const postResetChat = () => request<ResetResponse>('/api/reset-chat', { method: 'POST' })
 export const postMemory = (body: NewMemory) =>
   request<Memory>('/api/memories', { method: 'POST', body: JSON.stringify(body) })
-export const getMemories = (q: string, category: Category | 'all') => {
+export const getMemories = (q: string, category: MemoryFilter) => {
   const params = new URLSearchParams()
   if (q) params.set('q', q)
   if (category !== 'all') params.set('category', category)

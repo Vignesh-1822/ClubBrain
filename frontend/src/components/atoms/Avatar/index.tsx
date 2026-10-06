@@ -6,9 +6,9 @@ type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 const SIZE_CLASSES: Record<Size, { box: string; text: string; icon: number; dot: string }> = {
   xs: { box: 'h-5 w-5', text: 'text-[9px]', icon: 11, dot: 'h-1.5 w-1.5' },
   sm: { box: 'h-7 w-7', text: 'text-[11px]', icon: 14, dot: 'h-2 w-2' },
-  md: { box: 'h-9 w-9', text: 'text-[13px]', icon: 17, dot: 'h-2.5 w-2.5' },
-  lg: { box: 'h-10 w-10', text: 'text-sm', icon: 19, dot: 'h-2.5 w-2.5' },
-  xl: { box: 'h-12 w-12', text: 'text-base', icon: 22, dot: 'h-3 w-3' },
+  md: { box: 'h-8 w-8', text: 'text-[12px]', icon: 15, dot: 'h-2 w-2' },
+  lg: { box: 'h-9 w-9', text: 'text-[13px]', icon: 17, dot: 'h-2.5 w-2.5' },
+  xl: { box: 'h-10 w-10', text: 'text-[14px]', icon: 19, dot: 'h-2.5 w-2.5' },
 }
 
 interface Props {
@@ -28,7 +28,7 @@ export default function Avatar({ name, size = 'md', online = false, className = 
         {isBot ? <Brain size={s.icon} strokeWidth={2.2} /> : name.charAt(0).toUpperCase()}
       </span>
       {online && (
-        <span className={`absolute bottom-0 right-0 rounded-full bg-lemon ring-[2.5px] ring-panel ${s.dot}`} />
+        <span className={`absolute bottom-0 right-0 rounded-full bg-lemon ring-2 ring-panel ${s.dot}`} />
       )}
     </span>
   )

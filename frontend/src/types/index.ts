@@ -1,4 +1,16 @@
-export type Category = 'decision' | 'lesson' | 'person' | 'sponsor' | 'event' | 'preference' | 'warning'
+export type Category =
+  | 'decision'
+  | 'lesson'
+  | 'person'
+  | 'sponsor'
+  | 'event'
+  | 'preference'
+  | 'warning'
+  | 'alumni'
+  | 'pitch'
+  | 'rule'
+
+export type MemoryFilter = Category | 'all'
 
 export interface Memory {
   id: string
@@ -40,6 +52,15 @@ export interface ChatResponse {
   messages: Message[]
 }
 
+export interface WelcomeRequest {
+  member: string
+  role: string
+}
+
+export interface ResetResponse {
+  status?: string
+}
+
 export interface NewMemory {
   text: string
   category: Category
@@ -50,6 +71,16 @@ export interface Persona {
   name: string
   role: string
   isAdmin?: boolean
+  /** Newly joined member — shows a "New" tag */
+  isNew?: boolean
+}
+
+/** Local record of the new-member join moment, used to place the system line. */
+export interface JoinEvent {
+  name: string
+  /** id of the last message present when the member joined (null = before all messages) */
+  afterMessageId: string | null
+  time: string
 }
 
 export interface CategoryMeta {
@@ -97,4 +128,11 @@ export interface ConnectedSource {
   connected: boolean
   /** lucide icon tile classes */
   tile: string
+}
+
+export interface SuggestedQuestion {
+  /** Short chip text */
+  label: string
+  /** Full question sent to the chat */
+  prompt: string
 }

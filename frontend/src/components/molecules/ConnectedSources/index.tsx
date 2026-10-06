@@ -14,23 +14,23 @@ export default function ConnectedSources({ isMem0 }: { isMem0: boolean }) {
     <div>
       <ul className="space-y-0.5">
         {SOURCES.map(({ name, connected, tile, icon: Icon }) => (
-          <li key={name} className="flex items-center gap-3 py-1">
-            <span className={`flex h-8 w-8 items-center justify-center rounded-full ${tile}`}>
-              <Icon size={15} strokeWidth={2.1} />
+          <li key={name} className="flex items-center gap-2.5 py-[3px]">
+            <span className={`flex h-6 w-6 items-center justify-center rounded-full ${tile}`}>
+              <Icon size={12} strokeWidth={2.1} />
             </span>
-            <span className={`text-[14px] ${connected ? 'font-medium text-white' : 'text-white/70'}`}>{name}</span>
+            <span className={`text-[12.5px] ${connected ? 'font-medium text-white' : 'text-white/70'}`}>{name}</span>
             {connected ? (
-              <span className="ml-auto inline-flex items-center gap-1.5 text-[12px] font-medium text-lemon">
+              <span className="ml-auto inline-flex items-center gap-1.5 text-[11px] font-medium text-lemon">
                 <span className="h-1.5 w-1.5 rounded-full bg-lemon shadow-[0_0_0_3px_rgba(238,242,155,0.15)]" />
                 Connected
               </span>
             ) : (
-              <span className="ml-auto rounded-full bg-panel-3 px-2.5 py-0.5 text-[11px] text-muted">Coming soon</span>
+              <span className="ml-auto rounded-full bg-panel-3 px-2 py-px text-[10px] text-muted">Coming soon</span>
             )}
           </li>
         ))}
       </ul>
-      <p className="mt-3 flex items-center gap-2 border-t border-white/5 pt-3 text-[11px] text-muted">
+      <p className="mt-2 flex items-center gap-2 border-t border-white/5 pt-2 text-[10.5px] text-muted">
         <span className={`h-1.5 w-1.5 rounded-full ${isMem0 ? 'bg-lemon' : 'bg-white/30'}`} />
         {isMem0 ? 'Powered by Mem0' : 'Local memory'}
       </p>

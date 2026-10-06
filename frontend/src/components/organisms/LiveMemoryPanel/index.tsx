@@ -20,10 +20,10 @@ export default function LiveMemoryPanel({ onOpen }: { onOpen: () => void }) {
   const arrivedAt = (id: string): number => arrivals?.get(id) ?? 0
 
   return (
-    <section className="flex min-h-[280px] flex-1 flex-col rounded-[28px] bg-panel p-5">
+    <section className="flex min-h-[240px] flex-1 flex-col rounded-[20px] bg-panel p-4">
       <div className="flex items-center gap-2">
-        <button onClick={onOpen} className="text-[22px] font-bold text-white transition hover:text-lemon">Club Memory</button>
-        <span className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-lemon/10 px-2.5 py-1 text-[11px] font-semibold text-lemon">
+        <button onClick={onOpen} className="text-[15px] font-bold text-white transition hover:text-lemon">Club Memory</button>
+        <span className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-lemon/10 px-2 py-0.5 text-[10.5px] font-semibold text-lemon">
           <span className="relative flex h-1.5 w-1.5">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-lemon opacity-75" />
             <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-lemon" />
@@ -31,7 +31,7 @@ export default function LiveMemoryPanel({ onOpen }: { onOpen: () => void }) {
           Live · {data?.length ?? 0}
         </span>
       </div>
-      <div className="-mx-1 mt-4 min-h-0 flex-1 space-y-2 overflow-y-auto px-1">
+      <div className="-mx-1 mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto px-1">
         {latest.length === 0 && (
           <div className="flex flex-col items-center px-4 py-6 text-center">
             <span className="flex h-11 w-11 items-center justify-center rounded-full bg-panel-2 text-lemon">
