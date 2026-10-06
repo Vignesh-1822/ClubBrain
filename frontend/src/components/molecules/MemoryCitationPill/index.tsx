@@ -1,5 +1,4 @@
-import { ChevronRight } from 'lucide-react'
-import { getCategoryIcon, getCategoryMeta } from '../../../lib/category'
+import { Brain, ChevronRight } from 'lucide-react'
 import type { Memory } from '../../../types'
 
 interface Props {
@@ -7,31 +6,23 @@ interface Props {
   onClick: () => void
 }
 
-/** Perplexity-style "sources" chip under a ClubBrain answer. */
+/** "Sources" chip under a ClubBrain answer that opens the Memory Trace. */
 export default function MemoryCitationPill({ memories, onClick }: Props) {
   const count = memories.length
-  const categories = [...new Set(memories.map((m) => m.category))].slice(0, 3)
   return (
     <button
       onClick={onClick}
-      className="group mt-1.5 inline-flex items-center gap-2 rounded-full border border-violet-200/80 bg-white py-1 pl-1 pr-2.5 text-[12px] shadow-sm transition hover:border-violet-300 hover:shadow-md hover:shadow-violet-500/10"
+      className="group mt-3 inline-flex items-center gap-2 rounded-full bg-panel-2 py-1.5 pl-1.5 pr-3.5 text-[13px] transition hover:bg-panel-3"
     >
-      <span className="flex -space-x-1">
-        {categories.map((c) => {
-          const Icon = getCategoryIcon(c)
-          return (
-            <span key={c} className={`flex h-5 w-5 items-center justify-center rounded-full ring-2 ring-white ${getCategoryMeta(c).tile}`}>
-              <Icon size={10} strokeWidth={2.5} />
-            </span>
-          )
-        })}
+      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-lemon/15 text-lemon">
+        <Brain size={13} strokeWidth={2.4} />
       </span>
-      <span className="font-semibold text-violet-700">
+      <span className="font-semibold text-white">
         {count} {count === 1 ? 'memory' : 'memories'} retrieved
       </span>
-      <span className="text-slate-300">·</span>
-      <span className="text-slate-500 group-hover:text-slate-700">Why do you know this?</span>
-      <ChevronRight size={13} className="text-slate-400 transition group-hover:translate-x-0.5" />
+      <span className="text-muted">·</span>
+      <span className="text-lemon/90 group-hover:text-lemon">Why do you know this?</span>
+      <ChevronRight size={14} className="text-muted transition group-hover:translate-x-0.5 group-hover:text-lemon" />
     </button>
   )
 }

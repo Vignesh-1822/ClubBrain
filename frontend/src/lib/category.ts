@@ -1,14 +1,16 @@
 import { CalendarDays, Handshake, Lightbulb, ThumbsUp, TriangleAlert, User, Zap, type LucideIcon } from 'lucide-react'
 import type { Category, CategoryMeta } from '../types'
 
+const CHIP_ACTIVE = 'bg-lemon text-black ring-lemon'
+
 export const CATEGORY_META: Record<Category, CategoryMeta> = {
-  decision: { label: 'Decision', plural: 'Decisions', text: 'text-blue-600', tile: 'bg-blue-50 text-blue-600 ring-blue-100', dot: 'bg-blue-500', chip: 'bg-blue-600 text-white ring-blue-600' },
-  lesson: { label: 'Lesson', plural: 'Lessons', text: 'text-amber-600', tile: 'bg-amber-50 text-amber-600 ring-amber-100', dot: 'bg-amber-500', chip: 'bg-amber-500 text-white ring-amber-500' },
-  person: { label: 'Person', plural: 'People', text: 'text-fuchsia-600', tile: 'bg-fuchsia-50 text-fuchsia-600 ring-fuchsia-100', dot: 'bg-fuchsia-500', chip: 'bg-fuchsia-600 text-white ring-fuchsia-600' },
-  sponsor: { label: 'Sponsor', plural: 'Sponsors', text: 'text-emerald-600', tile: 'bg-emerald-50 text-emerald-600 ring-emerald-100', dot: 'bg-emerald-500', chip: 'bg-emerald-600 text-white ring-emerald-600' },
-  event: { label: 'Event', plural: 'Events', text: 'text-sky-600', tile: 'bg-sky-50 text-sky-600 ring-sky-100', dot: 'bg-sky-500', chip: 'bg-sky-600 text-white ring-sky-600' },
-  preference: { label: 'Preference', plural: 'Preferences', text: 'text-teal-600', tile: 'bg-teal-50 text-teal-600 ring-teal-100', dot: 'bg-teal-500', chip: 'bg-teal-600 text-white ring-teal-600' },
-  warning: { label: 'Warning', plural: 'Warnings', text: 'text-rose-600', tile: 'bg-rose-50 text-rose-600 ring-rose-100', dot: 'bg-rose-500', chip: 'bg-rose-600 text-white ring-rose-600' },
+  decision: { label: 'Decision', plural: 'Decisions', text: 'text-sky-300', tile: 'bg-sky-400/10 text-sky-300 ring-sky-400/20', dot: 'bg-sky-400', chip: CHIP_ACTIVE },
+  lesson: { label: 'Lesson', plural: 'Lessons', text: 'text-amber-300', tile: 'bg-amber-400/10 text-amber-300 ring-amber-400/20', dot: 'bg-amber-400', chip: CHIP_ACTIVE },
+  person: { label: 'Person', plural: 'People', text: 'text-fuchsia-300', tile: 'bg-fuchsia-400/10 text-fuchsia-300 ring-fuchsia-400/20', dot: 'bg-fuchsia-400', chip: CHIP_ACTIVE },
+  sponsor: { label: 'Sponsor', plural: 'Sponsors', text: 'text-emerald-300', tile: 'bg-emerald-400/10 text-emerald-300 ring-emerald-400/20', dot: 'bg-emerald-400', chip: CHIP_ACTIVE },
+  event: { label: 'Event', plural: 'Events', text: 'text-violet-300', tile: 'bg-violet-400/10 text-violet-300 ring-violet-400/20', dot: 'bg-violet-400', chip: CHIP_ACTIVE },
+  preference: { label: 'Preference', plural: 'Preferences', text: 'text-teal-300', tile: 'bg-teal-400/10 text-teal-300 ring-teal-400/20', dot: 'bg-teal-400', chip: CHIP_ACTIVE },
+  warning: { label: 'Warning', plural: 'Warnings', text: 'text-rose-300', tile: 'bg-rose-400/10 text-rose-300 ring-rose-400/20', dot: 'bg-rose-400', chip: CHIP_ACTIVE },
 }
 
 export const CATEGORY_ICON: Record<Category, LucideIcon> = {

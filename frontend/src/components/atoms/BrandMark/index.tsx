@@ -1,15 +1,13 @@
 import { Brain } from 'lucide-react'
-import { BRAIN_GRADIENT } from '../../../lib/persona'
 
-export default function BrandMark({ size = 32 }: { size?: number }) {
+export default function BrandMark({ size = 56 }: { size?: number }) {
   return (
     <div
-      className={`relative flex items-center justify-center rounded-[10px] text-white shadow-md shadow-violet-500/25 ring-1 ring-white/20 ${BRAIN_GRADIENT}`}
+      className="flex items-center justify-center rounded-full bg-lemon text-black shadow-[0_0_0_6px_rgba(238,242,155,0.08)]"
       style={{ width: size, height: size }}
       aria-hidden
     >
-      <Brain size={Math.round(size * 0.55)} strokeWidth={2.2} />
-      <span className="absolute inset-0 rounded-[10px] bg-gradient-to-b from-white/25 to-transparent" />
+      <Brain size={Math.round(size * 0.5)} strokeWidth={2.3} />
     </div>
   )
 }

@@ -1,13 +1,12 @@
-import { Brain } from 'lucide-react'
+import { Brain, Loader2, Sparkles } from 'lucide-react'
 import { useState } from 'react'
-import { useMemories } from '../../../hooks'
+import { useMemories, useSeed } from '../../../hooks'
 import MemoryCard from '../../molecules/MemoryCard'
 
-export default function LiveMemoryPanel() {
+export default function LiveMemoryPanel({ onOpen }: { onOpen: () => void }) {
   const { data } = useMemories('', 'all', 3000)
-  const latest = [...(data ?? [])]
-    .sort((a, b) => b.created_at.localeCompare(a.created_at))
-    .slice(0, 12)
+  const seed = useSeed()
+  const latest = [...(data ?? [])].sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, 12)
   // id -> time it first appeared (0 = present on initial load). Only later arrivals glow.
   const [arrivals, setArrivals] = useState<Map<string, number> | null>(null)
   if (data && (arrivals === null || data.some((m) => !arrivals.has(m.id)))) {
@@ -21,31 +20,33 @@ export default function LiveMemoryPanel() {
   const arrivedAt = (id: string): number => arrivals?.get(id) ?? 0
 
   return (
-    <aside className="hidden w-[320px] shrink-0 flex-col border-l border-slate-200/80 bg-[#fafafa] xl:flex">
-      <div className="border-b border-slate-200/80 px-4 py-3">
-        <div className="flex items-center gap-2">
-          <Brain size={15} className="text-violet-600" strokeWidth={2.3} />
-          <h3 className="text-[13px] font-semibold text-slate-900">Club Memory</h3>
-          <span className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-700 ring-1 ring-inset ring-emerald-200">
-            <span className="relative flex h-1.5 w-1.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
-            </span>
-            Live
+    <section className="flex min-h-[280px] flex-1 flex-col rounded-[28px] bg-panel p-5">
+      <div className="flex items-center gap-2">
+        <button onClick={onOpen} className="text-[22px] font-bold text-white transition hover:text-lemon">Club Memory</button>
+        <span className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-lemon/10 px-2.5 py-1 text-[11px] font-semibold text-lemon">
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-lemon opacity-75" />
+            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-lemon" />
           </span>
-        </div>
-        <p className="mt-0.5 text-[11px] text-slate-500">
-          <span className="font-semibold tabular-nums text-slate-700">{data?.length ?? 0}</span> memories · newest first
-        </p>
+          Live · {data?.length ?? 0}
+        </span>
       </div>
-      <div className="flex-1 space-y-2 overflow-y-auto p-3">
+      <div className="-mx-1 mt-4 min-h-0 flex-1 space-y-2 overflow-y-auto px-1">
         {latest.length === 0 && (
-          <div className="mt-8 flex flex-col items-center px-6 text-center">
-            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-violet-50 text-violet-500 ring-1 ring-violet-100">
-              <Brain size={18} />
+          <div className="flex flex-col items-center px-4 py-6 text-center">
+            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-panel-2 text-lemon">
+              <Brain size={19} />
             </span>
-            <p className="mt-3 text-xs font-medium text-slate-600">No memories yet</p>
-            <p className="mt-1 text-[11px] text-slate-400">Important knowledge from the chat will appear here in real time.</p>
+            <p className="mt-3 text-[13px] font-medium text-white">No memories yet</p>
+            <p className="mt-1 text-[12px] text-muted">Knowledge from the chat appears here in real time.</p>
+            <button
+              onClick={() => seed.mutate()}
+              disabled={seed.isPending}
+              className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-lemon px-4 py-2 text-[13px] font-semibold text-black transition hover:brightness-105 disabled:opacity-60"
+            >
+              {seed.isPending ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
+              Load demo memories
+            </button>
           </div>
         )}
         {latest.map((m, i) => (
@@ -59,6 +60,6 @@ export default function LiveMemoryPanel() {
           />
         ))}
       </div>
-    </aside>
+    </section>
   )
 }

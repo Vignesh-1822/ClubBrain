@@ -11,6 +11,9 @@ export interface Memory {
 export interface DetectedMemory {
   text: string
   category: Category
+  /** Backend auto-saves durable knowledge; missing is treated as saved. */
+  saved?: boolean
+  memory_id?: string
 }
 
 export interface Message {
@@ -46,6 +49,7 @@ export interface NewMemory {
 export interface Persona {
   name: string
   role: string
+  isAdmin?: boolean
 }
 
 export interface CategoryMeta {
@@ -72,4 +76,25 @@ export interface MessageGrouping {
   isLastInGroup: boolean
 }
 
-export type DetectedStatus = 'idle' | 'saved' | 'dismissed'
+
+export type Tab = 'chat' | 'memory'
+
+export interface Community {
+  id: string
+  label: string
+  active?: boolean
+}
+
+export interface ConversationPreview {
+  id: string
+  name: string
+  preview: string
+  initials: string
+}
+
+export interface ConnectedSource {
+  name: string
+  connected: boolean
+  /** lucide icon tile classes */
+  tile: string
+}

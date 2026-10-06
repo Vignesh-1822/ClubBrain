@@ -17,26 +17,24 @@ export default function MemoryCard({ memory, compact = false, animation = 'pop',
   const isWarning = memory.category === 'warning'
   return (
     <article
-      className={`group relative overflow-hidden rounded-2xl border bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition hover:-translate-y-px hover:shadow-[0_6px_20px_-8px_rgba(15,23,42,0.18)] ${
-        isWarning ? 'border-rose-200/80' : 'border-slate-200/80'
-      } ${compact ? 'p-3' : 'p-4'} ${ANIMATION_CLASS[animation]}`}
+      className={`group relative overflow-hidden bg-panel-2 transition hover:bg-panel-3 ${
+        compact ? 'rounded-[18px] p-3' : 'rounded-[24px] p-5'
+      } ${ANIMATION_CLASS[animation]}`}
       style={index !== undefined && animation === 'pop' ? { animationDelay: `${Math.min(index, 10) * 30}ms` } : undefined}
     >
-      {isWarning && <span className="absolute inset-y-0 left-0 w-[3px] bg-rose-500" />}
-      <div className="flex items-center gap-2">
-        <span className={`flex shrink-0 items-center justify-center rounded-lg ring-1 ring-inset ${meta.tile} ${compact ? 'h-6 w-6' : 'h-7 w-7'}`}>
-          <Icon size={compact ? 12 : 14} strokeWidth={2.3} />
+      {isWarning && <span className="absolute inset-y-0 left-0 w-1 bg-rose-400" />}
+      <div className="flex items-center gap-2.5">
+        <span className={`flex shrink-0 items-center justify-center rounded-xl ring-1 ring-inset ${meta.tile} ${compact ? 'h-7 w-7' : 'h-9 w-9'}`}>
+          <Icon size={compact ? 13 : 16} strokeWidth={2.2} />
         </span>
-        <span className={`text-[11px] font-semibold uppercase tracking-wide ${meta.text}`}>{meta.label}</span>
-        {isNew && (
-          <span className="rounded-full bg-violet-100 px-1.5 py-px text-[10px] font-semibold text-violet-700">New</span>
-        )}
-        <time className="ml-auto text-[11px] text-slate-400" title={formatDate(memory.created_at)}>
+        <span className={`text-[12px] font-semibold ${meta.text}`}>{meta.label}</span>
+        {isNew && <span className="rounded-full bg-lemon px-1.5 py-px text-[10px] font-bold text-black">New</span>}
+        <time className="ml-auto text-[11px] text-muted" title={formatDate(memory.created_at)}>
           {formatRelative(memory.created_at)}
         </time>
       </div>
-      <p className={`mt-2 leading-relaxed text-slate-800 ${compact ? 'text-[13px]' : 'text-sm'}`}>{memory.text}</p>
-      <p className="mt-2.5 flex items-center gap-1.5 truncate text-[11px] text-slate-400">
+      <p className={`leading-relaxed text-white/90 ${compact ? 'mt-2 text-[13px]' : 'mt-3 text-[14px]'}`}>{memory.text}</p>
+      <p className="mt-2.5 flex items-center gap-1.5 truncate text-[11px] text-muted">
         <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${meta.dot}`} />
         {memory.source}
       </p>

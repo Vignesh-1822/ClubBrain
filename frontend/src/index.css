@@ -2,9 +2,13 @@
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --color-imessage: #0a84ff;
-  --color-bubble-gray: #e9e9eb;
-  --color-bubble-brain: #f1edff;
+  --color-lemon: #eef29b;
+  --color-lemon-soft: #f4f6a6;
+  --color-ink: #000000;
+  --color-panel: #1a1a1a;
+  --color-panel-2: #232323;
+  --color-panel-3: #2c2c2c;
+  --color-muted: #8a8a8a;
 
   --animate-msg-in: msg-in 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) both;
   --animate-slide-in: slide-in 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) both;
@@ -30,9 +34,9 @@
     30% { transform: translateY(-3px); opacity: 1; }
   }
   @keyframes memory-in {
-    0% { opacity: 0; transform: translateY(-10px) scale(0.97); box-shadow: 0 0 0 0 rgb(139 92 246 / 0); }
-    15% { opacity: 1; transform: translateY(0) scale(1); box-shadow: 0 0 0 3px rgb(139 92 246 / 0.25), 0 8px 24px -6px rgb(139 92 246 / 0.35); }
-    100% { box-shadow: 0 0 0 0 rgb(139 92 246 / 0), 0 1px 2px 0 rgb(15 23 42 / 0.04); }
+    0% { opacity: 0; transform: translateY(-10px) scale(0.97); box-shadow: 0 0 0 0 rgb(238 242 155 / 0); }
+    15% { opacity: 1; transform: translateY(0) scale(1); box-shadow: 0 0 0 3px rgb(238 242 155 / 0.35), 0 8px 24px -6px rgb(238 242 155 / 0.2); }
+    100% { box-shadow: 0 0 0 0 rgb(238 242 155 / 0), 0 1px 2px 0 rgb(0 0 0 / 0); }
   }
   @keyframes pop-in {
     from { opacity: 0; transform: translateY(6px) scale(0.96); }
@@ -43,9 +47,11 @@
 html, body, #root { height: 100%; }
 body {
   margin: 0;
-  background: #f7f7f8;
-  color: #0f172a;
+  background: #000;
+  color: #fff;
   font-family: var(--font-sans);
   font-feature-settings: "cv11", "ss01";
   -webkit-font-smoothing: antialiased;
 }
+
+* { scrollbar-width: thin; scrollbar-color: #333 transparent; }

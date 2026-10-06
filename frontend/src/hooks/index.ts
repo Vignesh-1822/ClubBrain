@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { getHealth, getMemories, getMessages, postChat, postMemory, seedMemories } from '../services/api'
+import { getHealth, getMemories, getMessages, postChat, seedMemories } from '../services/api'
 import type { Category, Message } from '../types'
 
 export const useHealth = () => useQuery({ queryKey: ['health'], queryFn: getHealth, retry: false })
@@ -22,14 +22,6 @@ export const useSendChat = () => {
       qc.setQueryData<Message[]>(['messages'], (old) => [...(old ?? []), ...data.messages])
       qc.invalidateQueries({ queryKey: ['memories'] })
     },
-  })
-}
-
-export const useSaveMemory = () => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: postMemory,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['memories'] }),
   })
 }
 

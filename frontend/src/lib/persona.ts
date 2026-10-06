@@ -3,7 +3,7 @@ import type { Persona } from '../types'
 export const BOT_NAME = 'ClubBrain'
 
 export const PERSONAS: Persona[] = [
-  { name: 'Maya', role: 'President' },
+  { name: 'Maya', role: 'President', isAdmin: true },
   { name: 'Alex', role: 'Sponsorship' },
   { name: 'Sarah', role: 'Events' },
   { name: 'Vignesh', role: 'Engineering' },
@@ -21,4 +21,4 @@ const FALLBACK_GRADIENTS = ['from-slate-400 to-slate-500', 'from-pink-400 to-ros
 export const avatarGradient = (name: string): string =>
   AVATAR_GRADIENTS[name] ?? FALLBACK_GRADIENTS[name.length % FALLBACK_GRADIENTS.length]
 
-export const BRAIN_GRADIENT = 'bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500'
+export const BRAIN_BG = 'bg-lemon text-black'

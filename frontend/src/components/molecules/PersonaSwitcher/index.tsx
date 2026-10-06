@@ -1,37 +1,50 @@
-import { Check } from 'lucide-react'
-import { PERSONAS } from '../../../lib/persona'
+import { BOT_NAME, PERSONAS } from '../../../lib/persona'
 import Avatar from '../../atoms/Avatar'
+import AiTag from '../../atoms/AiTag'
 
 interface Props {
   persona: string
   onChange: (name: string) => void
 }
 
+/** "Members" list that doubles as the speaking-as switcher. */
 export default function PersonaSwitcher({ persona, onChange }: Props) {
   return (
-    <div>
-      <p className="px-2 text-[11px] font-medium uppercase tracking-wider text-slate-400">Speaking as</p>
-      <div className="mt-1.5 space-y-0.5">
-        {PERSONAS.map((p) => {
-          const active = p.name === persona
-          return (
+    <ul className="space-y-0.5">
+      {PERSONAS.map((p) => {
+        const active = p.name === persona
+        return (
+          <li key={p.name}>
             <button
-              key={p.name}
               onClick={() => onChange(p.name)}
-              className={`flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left transition ${
-                active ? 'bg-white shadow-sm ring-1 ring-slate-200' : 'hover:bg-slate-200/50'
-              }`}
+              title={`Speak as ${p.name}`}
+              className={`flex w-full items-center gap-3.5 rounded-2xl px-2 py-1.5 text-left transition ${active ? 'bg-panel-2' : 'hover:bg-panel-2/60'}`}
             >
-              <Avatar name={p.name} size="sm" />
+              <Avatar
+                name={p.name}
+                size="lg"
+                online
+                className={`rounded-full ${active ? 'ring-2 ring-lemon ring-offset-2 ring-offset-panel' : ''}`}
+              />
               <span className="min-w-0 flex-1">
-                <span className={`block text-[13px] leading-tight ${active ? 'font-semibold text-slate-900' : 'font-medium text-slate-700'}`}>{p.name}</span>
-                <span className="block text-[11px] leading-tight text-slate-400">{p.role}</span>
+                <span className="block truncate text-[15px] text-white">
+                  {p.name}
+                  {active && <span className="ml-2 text-[12px] font-semibold text-lemon">You</span>}
+                </span>
+                <span className="block text-[12px] text-muted">{p.role}</span>
               </span>
-              {active && <Check size={14} className="text-imessage" strokeWidth={2.6} />}
+              {p.isAdmin && <span className="text-[13px] text-white/80">Admin</span>}
             </button>
-          )
-        })}
-      </div>
-    </div>
+          </li>
+        )
+      })}
+      <li className="flex items-center gap-3.5 px-2 py-1.5">
+        <Avatar name={BOT_NAME} size="lg" online />
+        <span className="min-w-0 flex-1">
+          <span className="flex items-center gap-2 text-[15px] text-white">{BOT_NAME} <AiTag /></span>
+          <span className="block text-[12px] text-muted">Club memory</span>
+        </span>
+      </li>
+    </ul>
   )
 }
