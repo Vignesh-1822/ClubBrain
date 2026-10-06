@@ -12,6 +12,7 @@ const FILTERS: { id: Filter; label: string }[] = [
   { id: 'person', label: 'People' },
   { id: 'sponsor', label: 'Sponsors' },
   { id: 'event', label: 'Events' },
+  { id: 'preference', label: 'Preferences' },
   { id: 'warning', label: 'Warnings' },
 ]
 
@@ -23,7 +24,8 @@ export default function MemoryBrowser() {
 
   return (
     <div className="h-full overflow-y-auto p-8">
-      <h2 className="text-2xl font-bold">🧠 Club Memory — Everything your organization has learned.</h2>
+      <h2 className="text-2xl font-bold tracking-tight">🧠 Club Memory</h2>
+      <p className="mt-1 text-sm text-slate-500">Everything your organization has learned.</p>
       <div className="mt-5 flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-3 py-2">
         <Search size={16} className="text-slate-400" />
         <input
@@ -46,7 +48,9 @@ export default function MemoryBrowser() {
       </div>
       {memories.length === 0 ? (
         <p className="mt-10 text-center text-sm text-slate-500">
-          No memories yet. ClubBrain will surface important knowledge from your conversations.
+          {debounced || filter !== 'all'
+            ? 'No memories match your search or filter.'
+            : 'No memories yet. ClubBrain will surface important knowledge from your conversations.'}
         </p>
       ) : (
         <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

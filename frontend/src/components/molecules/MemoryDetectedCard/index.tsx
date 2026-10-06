@@ -1,12 +1,14 @@
-import { useState } from 'react'
 import { useSaveMemory } from '../../../hooks'
-import type { Message } from '../../../types'
+import type { DetectedStatus, Message } from '../../../types'
 import CategoryBadge from '../../atoms/CategoryBadge'
 
-type Status = 'idle' | 'saved' | 'dismissed'
+interface Props {
+  message: Message
+  status: DetectedStatus
+  onStatusChange: (status: DetectedStatus) => void
+}
 
-export default function MemoryDetectedCard({ message }: { message: Message }) {
-  const [status, setStatus] = useState<Status>('idle')
+export default function MemoryDetectedCard({ message, status, onStatusChange: setStatus }: Props) {
   const save = useSaveMemory()
   const detected = message.detected_memory
   if (!detected || status === 'dismissed') return null

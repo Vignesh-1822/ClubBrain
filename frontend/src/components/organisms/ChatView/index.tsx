@@ -1,7 +1,7 @@
 import { Send } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useMessages, useSendChat } from '../../../hooks'
-import type { Memory, Persona } from '../../../types'
+import type { DetectedStatus, Memory, Persona } from '../../../types'
 import MessageBubble from '../../molecules/MessageBubble'
 import TypingIndicator from '../../atoms/TypingIndicator'
 import MemoryTracePanel from '../MemoryTracePanel'
@@ -20,6 +20,10 @@ export default function ChatView() {
   const [persona, setPersona] = useState('Vignesh')
   const [draft, setDraft] = useState('')
   const [trace, setTrace] = useState<Memory[] | null>(null)
+  const [detectedStatuses, setDetectedStatuses] = useState<Record<string, DetectedStatus>>({})
+
+  const handleDetectedStatus = (id: string, status: DetectedStatus) =>
+    setDetectedStatuses((prev) => ({ ...prev, [id]: status }))
   const endRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -53,7 +57,14 @@ export default function ChatView() {
         </header>
         <div className="flex-1 space-y-4 overflow-y-auto px-5 py-4">
           {messages.map((m) => (
-            <MessageBubble key={m.id} message={m} isMine={m.sender === persona} onShowTrace={setTrace} />
+            <MessageBubble
+              key={m.id}
+              message={m}
+              isMine={m.sender === persona}
+              onShowTrace={setTrace}
+              detectedStatus={detectedStatuses[m.id] ?? 'idle'}
+              onDetectedStatusChange={handleDetectedStatus}
+            />
           ))}
           {send.isPending && <TypingIndicator />}
           {send.isError && <p className="text-xs text-red-500">Failed to send. Is the backend running?</p>}

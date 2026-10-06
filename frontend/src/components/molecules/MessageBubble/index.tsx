@@ -1,14 +1,23 @@
 import { formatTime } from '../../../lib/category'
-import type { Message } from '../../../types'
+import type { DetectedStatus, Message } from '../../../types'
 import MemoryDetectedCard from '../MemoryDetectedCard'
 
 interface Props {
   message: Message
   isMine: boolean
   onShowTrace: (memories: Message['retrieved_memories']) => void
+  detectedStatus: DetectedStatus
+  onDetectedStatusChange: (id: string, status: DetectedStatus) => void
 }
 
-export default function MessageBubble({ message, isMine, onShowTrace }: Props) {
+export default function MessageBubble({ message, isMine, onShowTrace, detectedStatus, onDetectedStatusChange }: Props) {
+  const detectedCard = (
+    <MemoryDetectedCard
+      message={message}
+      status={detectedStatus}
+      onStatusChange={(status) => onDetectedStatusChange(message.id, status)}
+    />
+  )
   const isBot = message.sender === 'ClubBrain'
   const count = message.retrieved_memories?.length ?? 0
 
@@ -17,7 +26,7 @@ export default function MessageBubble({ message, isMine, onShowTrace }: Props) {
       <div className="flex flex-col items-end">
         <div className="max-w-[75%] rounded-2xl rounded-br-md bg-blue-600 px-4 py-2 text-sm text-white">{message.content}</div>
         <span className="mt-0.5 text-[10px] text-slate-400">{formatTime(message.timestamp)}</span>
-        <MemoryDetectedCard message={message} />
+        {detectedCard}
       </div>
     )
   }
@@ -29,7 +38,7 @@ export default function MessageBubble({ message, isMine, onShowTrace }: Props) {
       </div>
       <div className="flex max-w-[75%] flex-col items-start">
         <span className="mb-0.5 text-[11px] font-medium text-slate-500">
-          {isBot ? '🤖 ClubBrain' : message.sender}
+          {isBot ? 'ClubBrain' : message.sender}
         </span>
         <div className={`whitespace-pre-wrap rounded-2xl rounded-tl-md px-4 py-2 text-sm ${isBot ? 'border border-violet-200 bg-white shadow-sm' : 'bg-slate-200 text-slate-900'}`}>
           {message.content}
@@ -43,7 +52,7 @@ export default function MessageBubble({ message, isMine, onShowTrace }: Props) {
           </button>
         )}
         <span className="mt-0.5 text-[10px] text-slate-400">{formatTime(message.timestamp)}</span>
-        <MemoryDetectedCard message={message} />
+        {detectedCard}
       </div>
     </div>
   )

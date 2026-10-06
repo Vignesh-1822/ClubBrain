@@ -47,3 +47,5 @@ export interface Persona {
   name: string
   role: string
 }
+
+export type DetectedStatus = 'idle' | 'saved' | 'dismissed'
