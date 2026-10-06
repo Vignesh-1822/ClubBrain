@@ -40,7 +40,7 @@ export const Hook: React.FC = () => {
           }}
         >
           <KineticText
-            text="And their knowledge leaves with them."
+            text="Their knowledge leaves with them."
             delay={78}
             fontSize={96}
             color={theme.text}

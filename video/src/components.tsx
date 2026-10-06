@@ -203,9 +203,10 @@ export const BrainIcon: React.FC<BrainIconProps> = ({
 interface LogoProps {
   size: number;
   drawProgress?: number;
+  glow?: boolean;
 }
 
-export const Logo: React.FC<LogoProps> = ({ size, drawProgress = 1 }) => (
+export const Logo: React.FC<LogoProps> = ({ size, drawProgress = 1, glow = true }) => (
   <div
     style={{
       width: size,
@@ -215,7 +216,7 @@ export const Logo: React.FC<LogoProps> = ({ size, drawProgress = 1 }) => (
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      boxShadow: `0 0 ${size * 0.6}px rgba(238, 242, 155, 0.25)`,
+      boxShadow: glow ? `0 0 ${size * 0.6}px rgba(238, 242, 155, 0.25)` : "none",
       flexShrink: 0,
     }}
   >
@@ -273,7 +274,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
       }}
     >
       {isBot ? (
-        <Logo size={60} />
+        <Logo size={60} glow={false} />
       ) : (
         <Avatar initials={initials} color={color} size={60} />
       )}
