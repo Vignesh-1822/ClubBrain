@@ -7,7 +7,10 @@ from services import llm_service, memory_service
 
 _history: List[Message] = []
 
-QUESTION_STARTS = ("what", "who", "when", "where", "which", "how", "should", "any")
+QUESTION_STARTS = (
+    "what", "who", "when", "where", "which", "how", "should", "any",
+    "tell", "show", "list", "help", "give", "prepare", "can",
+)
 
 
 def _is_question(content: str) -> bool:
@@ -29,11 +32,23 @@ def get_history() -> List[Message]:
     return _history
 
 
+def reset_history() -> None:
+    _history.clear()
+
+
+def welcome(member: str, role: str) -> List[Message]:
+    memories = memory_service.retrieve("club overview top events sponsors")
+    bot = _new_message("ClubBrain", llm_service.welcome_text(member, role, memories))
+    bot.retrieved_memories = memories
+    _history.append(bot)
+    return [bot]
+
+
 def handle_chat(sender: str, content: str) -> List[Message]:
     user_msg = _new_message(sender, content)
     new_messages = [user_msg]
     if _is_question(content):
-        memories = memory_service.search(content)
+        memories = memory_service.retrieve(content)
         bot = _new_message("ClubBrain", llm_service.answer(content, memories))
         bot.retrieved_memories = memories
         new_messages.append(bot)

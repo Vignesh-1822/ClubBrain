@@ -1,10 +1,13 @@
 import os
 import re
+import time
 import uuid
 from datetime import datetime, timezone
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Dict, List, Optional
 
 from models.schemas import Memory
+from services.seed_data import SEED_ITEMS
 
 CLUB_ID = "uw-ai-club"
 
@@ -53,6 +56,8 @@ def _normalize(raw: Any) -> List[Memory]:
                 category=str(meta.get("category", "lesson")),
                 source=str(meta.get("source", "")),
                 created_at=str(item.get("created_at") or ""),
+                event=str(meta.get("event", "")),
+                year=str(meta.get("year", "")),
             )
         )
     return out
@@ -70,14 +75,21 @@ def _local_search(query: str, limit: int) -> List[Memory]:
     return [m for _, m in scored[:limit]]
 
 
-def add_memory(text: str, category: str, source: str) -> Memory:
-    memory = Memory(id=str(uuid.uuid4()), text=text, category=category, source=source, created_at=_now())
+def add_memory(text: str, category: str, source: str, event: str = "", year: str = "") -> Memory:
+    memory = Memory(
+        id=str(uuid.uuid4()), text=text, category=category, source=source, created_at=_now(), event=event, year=year
+    )
+    metadata = {"category": category, "source": source}
+    if event:
+        metadata["event"] = event
+    if year:
+        metadata["year"] = year
     if _mem0_ok:
         try:
             resp = _client.add(
                 [{"role": "user", "content": text}],
                 user_id=CLUB_ID,
-                metadata={"category": category, "source": source},
+                metadata=metadata,
                 infer=False,
             )
             results = resp.get("results", []) if isinstance(resp, dict) else []
@@ -90,13 +102,47 @@ def add_memory(text: str, category: str, source: str) -> Memory:
     return memory
 
 
-def search(query: str, limit: int = 6) -> List[Memory]:
+def search(query: str, limit: int = 10) -> List[Memory]:
     if _mem0_ok:
         try:
             return _normalize(_client.search(query, filters={"user_id": CLUB_ID}, top_k=limit))
         except Exception:
             pass
     return _local_search(query, limit)
+
+
+# Query keywords that signal which memory categories matter; semantic search alone under-retrieves lists.
+CATEGORY_HINTS = [
+    ("event", r"\bevents\b|\borganized\b"),
+    ("sponsor", r"\bsponsors?\b|\bsponsorships?\b"),
+    ("alumni", r"\balumni\b|\balum\b|\bintros?\b"),
+    ("pitch", r"\bpitch(es)?\b|\bpresentations?\b"),
+    ("warning", r"\bavoid\b|\bmistakes?\b|\bnot work\b|\bwarnings?\b"),
+    ("rule", r"\brules?\b|\bpolic(y|ies)\b|\bverif\w*\b"),
+]
+MAX_PER_CATEGORY = 6
+
+
+def retrieve(query: str, limit: int = 10) -> List[Memory]:
+    """Hybrid retrieval: category-hinted memories first, then semantic matches, de-duplicated."""
+    semantic = search(query, limit)
+    wanted = [cat for cat, pattern in CATEGORY_HINTS if re.search(pattern, query.lower())]
+    if not wanted:
+        return semantic
+    pool = get_all()
+    if "pitch" in wanted:  # a pitch outline also needs the rules and risks to respect
+        wanted += [cat for cat in ("event", "alumni", "rule") if cat not in wanted]
+    buckets = [[m for m in pool if m.category == cat][:MAX_PER_CATEGORY] for cat in wanted]
+    hinted: List[Memory] = []
+    for rank in range(MAX_PER_CATEGORY):  # round-robin so every wanted category is represented
+        hinted.extend(bucket[rank] for bucket in buckets if rank < len(bucket))
+    merged: List[Memory] = []
+    seen = set()
+    for memory in hinted + semantic:
+        if memory.id not in seen:
+            seen.add(memory.id)
+            merged.append(memory)
+    return merged[:limit]
 
 
 def get_all() -> List[Memory]:
@@ -115,26 +161,33 @@ def list_memories(q: Optional[str], category: Optional[str]) -> List[Memory]:
     return memories
 
 
-SEED_MEMORIES = [
-    ("warning", "Avoid Memorial Union for events over 150 people — the 2025 hackathon (~287 attendees) had severe registration congestion."),
-    ("sponsor", "Google sponsorship outreach should begin 6–8 weeks before the hackathon."),
-    ("person", "Alex handled the Google sponsorship relationship last year."),
-    ("person", "Sarah handled venue coordination and the 2025 outdoor event permit."),
-    ("event", "Green Leaf Catering was reliable at the 2024 and 2025 events."),
-    ("warning", "Spice Kitchen arrived about 90 minutes late at a 2025 event."),
-    ("lesson", "Only announce sponsors after contracts are signed."),
-    ("lesson", "Large events need multiple registration lines."),
-]
+def reset_all() -> None:
+    """Delete every club memory (Mem0 and the local fallback)."""
+    _local.clear()
+    if _mem0_ok:
+        try:
+            _client.delete_all(user_id=CLUB_ID)
+        except Exception:
+            return
+        # Mem0 deletes asynchronously; wait until empty so the delete cannot wipe freshly seeded memories.
+        for _ in range(30):
+            if not get_all():
+                return
+            time.sleep(1)
 
 
-SEED_THRESHOLD = 8
-
-
-def seed() -> int:
-    """Idempotent: skip seeding when the club already has enough memories."""
+def seed(reset: bool = False) -> int:
+    """Seed the club's demo memories. With reset=True, wipe existing memories first."""
     existing = len(get_all())
-    if existing >= SEED_THRESHOLD:
+    if reset:
+        reset_all()
+    elif existing >= len(SEED_ITEMS):
         return existing
-    for category, text in SEED_MEMORIES:
-        add_memory(text, category, "Demo seed")
-    return len(SEED_MEMORIES)
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        list(
+            pool.map(
+                lambda item: add_memory(item.text, item.category, item.source, item.event, item.year),
+                SEED_ITEMS,
+            )
+        )
+    return len(SEED_ITEMS)

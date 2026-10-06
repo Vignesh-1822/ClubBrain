@@ -9,7 +9,9 @@ from models.schemas import (
     Memory,
     MemoryCreate,
     Message,
+    ResetChatResponse,
     SeedResponse,
+    WelcomeRequest,
 )
 from services import chat_service, llm_service, memory_service
 
@@ -42,5 +44,16 @@ def list_memories(q: Optional[str] = None, category: Optional[str] = None) -> Li
 
 
 @router.post("/seed", response_model=SeedResponse)
-def seed() -> SeedResponse:
-    return SeedResponse(count=memory_service.seed())
+def seed(reset: bool = False) -> SeedResponse:
+    return SeedResponse(count=memory_service.seed(reset))
+
+
+@router.post("/welcome", response_model=ChatResponse)
+def welcome(body: WelcomeRequest) -> ChatResponse:
+    return ChatResponse(messages=chat_service.welcome(body.member, body.role))
+
+
+@router.post("/reset-chat", response_model=ResetChatResponse)
+def reset_chat() -> ResetChatResponse:
+    chat_service.reset_history()
+    return ResetChatResponse(ok=True)

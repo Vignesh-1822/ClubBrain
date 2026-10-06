@@ -3,10 +3,10 @@ import os
 import re
 from typing import Dict, List, Optional
 
-from models.schemas import Memory
+from models.schemas import ALLOWED_CATEGORIES, Memory
 
 ANTHROPIC_MODELS = ["claude-sonnet-5-5", "claude-sonnet-4-5"]
-CATEGORIES = ["decision", "lesson", "person", "sponsor", "event", "preference", "warning"]
+CATEGORIES = ALLOWED_CATEGORIES
 
 
 def provider() -> str:
@@ -27,7 +27,7 @@ def _complete(system: str, user: str) -> str:
             try:
                 resp = client.messages.create(
                     model=model,
-                    max_tokens=400,
+                    max_tokens=500,
                     system=system,
                     messages=[{"role": "user", "content": user}],
                 )
@@ -52,10 +52,16 @@ KEYWORDS = ["last year", "decided", "avoid", "handled", "sponsor", "venue", "cat
 
 def _guess_category(text: str) -> str:
     t = text.lower()
+    if any(k in t for k in ["avoid", "late", "crowded", "congestion", "never paid"]):
+        return "warning"
+    if any(k in t for k in ["alumni", "alumna", "grad"]):
+        return "alumni"
+    if "pitch" in t:
+        return "pitch"
+    if any(k in t for k in ["rule", "must", "required", "verification"]):
+        return "rule"
     if "sponsor" in t:
         return "sponsor"
-    if any(k in t for k in ["avoid", "late", "crowded", "congestion"]):
-        return "warning"
     if "handled" in t:
         return "person"
     if "decided" in t:
@@ -83,7 +89,9 @@ def detect_memory(sender: str, content: str) -> Optional[Dict[str, str]]:
         return _heuristic_detect(content)
     system = (
         "You extract durable organizational knowledge for a student club (decisions, lessons, "
-        "people/responsibilities, sponsors, events, preferences, warnings). Rewrite the message into a clean, "
+        "people/responsibilities, sponsors, events, preferences, warnings, alumni, sponsor pitches, club rules). "
+        "Capture useful resources (sponsors, top alumni, event feedback), what did NOT work (areas to avoid), and club "
+        "rules (sponsor approval and signed agreements, attendee verification, valid sponsorships). Rewrite the message into a clean, "
         "self-contained, durable memory in third person with no chat filler, keeping key facts and numbers, e.g. "
         "\"Avoid Memorial Union for events over 150 people — 2025 hackathon (~287 attendees) had registration congestion.\" "
         "Respond with strict JSON only: "
@@ -107,15 +115,39 @@ def detect_memory(sender: str, content: str) -> Optional[Dict[str, str]]:
 def answer(question: str, memories: List[Memory]) -> str:
     if not memories:
         return "I don't have any memories about that yet. Save some club knowledge and ask again!"
-    fallback = "Based on your club's previous experience:\n" + "\n".join(f"• {m.text}" for m in memories)
+    fallback = "Based on your club's previous experience:\n" + "\n".join(f"- {m.text}" for m in memories)
     if provider() == "heuristic":
         return fallback
     system = (
-        "You are ClubBrain, a friendly club memory assistant. Answer using ONLY the provided memories. "
-        "Be concise (<=90 words) and use emoji bullets (⚠ 🤝 💡 👤)."
+        "You are ClubBrain, a friendly memory assistant for a student club. Answer using ONLY the provided "
+        "memories; never invent facts, names or numbers. If the memories do not cover something, say so briefly. "
+        "Reply in concise Markdown: short bullet lists, **bold** key numbers and names, optional short headings, "
+        "and a small table only for a 'top events' style question. Maximum 180 words. "
+        "If asked to help prepare a sponsor pitch, produce a pitch outline with these sections: Opening hook with "
+        "club stats; Past wins; Sponsor tiers; Alumni intros to request; Risks and rules to respect."
     )
     mem_text = "\n".join(f"- [{m.category}] {m.text}" for m in memories)
     try:
         return _complete(system, f"Memories:\n{mem_text}\n\nQuestion: {question}").strip() or fallback
+    except Exception:
+        return fallback
+
+
+def welcome_text(member: str, role: str, memories: List[Memory]) -> str:
+    fallback = (
+        f"Welcome to the club, **{member}**! I'm ClubBrain, the club's shared memory.\n\n"
+        "Ask me about our top events, sponsors, alumni, past pitches, club rules, or what to avoid when planning."
+    )
+    if provider() == "heuristic" or not memories:
+        return fallback
+    system = (
+        "You are ClubBrain, the memory assistant of a student club. Write a warm welcome in Markdown for a new "
+        "member: greet them by name and role, summarize the club in exactly 2 short lines grounded ONLY in the "
+        "provided memories (bold key numbers), then give 3 bullet suggestions of what they can ask (top events, "
+        "sponsors and alumni, what to avoid when planning). Maximum 90 words."
+    )
+    mem_text = "\n".join(f"- [{m.category}] {m.text}" for m in memories)
+    try:
+        return _complete(system, f"New member: {member} (role: {role})\nMemories:\n{mem_text}").strip() or fallback
     except Exception:
         return fallback

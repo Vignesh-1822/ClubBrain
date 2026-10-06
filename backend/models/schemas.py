@@ -1,6 +1,20 @@
 from typing import List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
+
+
+ALLOWED_CATEGORIES = [
+    "decision",
+    "lesson",
+    "person",
+    "sponsor",
+    "event",
+    "preference",
+    "warning",
+    "alumni",
+    "pitch",
+    "rule",
+]
 
 
 class Memory(BaseModel):
@@ -9,6 +23,16 @@ class Memory(BaseModel):
     category: str = "lesson"
     source: str = ""
     created_at: str = ""
+    event: str = ""
+    year: str = ""
+
+
+class SeedItem(BaseModel):
+    category: str
+    text: str
+    source: str
+    event: str = ""
+    year: str = ""
 
 
 class DetectedMemory(BaseModel):
@@ -41,6 +65,11 @@ class MemoryCreate(BaseModel):
     category: str = "lesson"
     source: str = "Chat"
 
+    @field_validator("category")
+    @classmethod
+    def _valid_category(cls, value: str) -> str:
+        return value if value in ALLOWED_CATEGORIES else "lesson"
+
 
 class HealthResponse(BaseModel):
     status: str
@@ -50,3 +79,12 @@ class HealthResponse(BaseModel):
 
 class SeedResponse(BaseModel):
     count: int
+
+
+class WelcomeRequest(BaseModel):
+    member: str
+    role: str = "New member"
+
+
+class ResetChatResponse(BaseModel):
+    ok: bool
